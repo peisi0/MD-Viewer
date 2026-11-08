@@ -10,6 +10,7 @@ struct MarkdownBlockView: View {
     var highlight: String? = nil
 
     @Environment(\.readerStyle) private var style
+    @Environment(\.readerContentWidth) private var contentWidth
     @Environment(\.colorScheme) private var colorScheme
     @State private var copied = false
 
@@ -157,6 +158,7 @@ struct MarkdownBlockView: View {
                     .padding(14)
                     .textSelection(.enabled)
             }
+            .frame(width: contentWidth, alignment: .leading)
         }
         .background(Color.primary.opacity(0.055),
                     in: RoundedRectangle(cornerRadius: 16, style: .continuous))
@@ -182,6 +184,7 @@ struct MarkdownBlockView: View {
             }
             .padding(12)
         }
+        .frame(width: contentWidth, alignment: .leading)
         .background(Color.primary.opacity(0.05),
                     in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay {

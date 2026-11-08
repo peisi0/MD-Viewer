@@ -26,17 +26,8 @@ struct AppearancePanel: View {
                 .buttonStyle(.plain)
             }
 
-            StyleSlider(title: "字号", value: $fontSize, range: 14...24) {
-                Text("A").font(.footnote)
-            } trailing: {
-                Text("A").font(.title3.weight(.semibold))
-            }
-
-            StyleSlider(title: "行距", value: $lineSpacing, range: 2...18) {
-                Image(systemName: "line.3.horizontal").font(.caption)
-            } trailing: {
-                Image(systemName: "line.3.horizontal.decrease").font(.caption)
-            }
+            StyleSlider(title: "字号", value: $fontSize, range: 14...24)
+            StyleSlider(title: "行距", value: $lineSpacing, range: 2...18)
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("外观").font(.caption).foregroundStyle(.secondary)

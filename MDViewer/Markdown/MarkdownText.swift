@@ -5,6 +5,27 @@ import Foundation
 /// a detached task, which keeps file I/O and parsing off the main thread.
 enum MarkdownText {
 
+    /// Cheap binary/text discrimination. Only the head of the file is scanned,
+    /// so a 20 MB document costs the same as a 2 KB one.
+    static func isText(_ data: Data) -> Bool {
+        guard !data.isEmpty else { return false }
+        // UTF-16 BOM: interleaved NUL bytes are expected, not binary.
+        if data.starts(with: [0xFF, 0xFE]) || data.starts(with: [0xFE, 0xFF]) { return true }
+        let head = data.prefix(8192)
+        var suspicious = 0
+        for byte in head {
+            if byte == 0 { return false }
+            if byte < 0x09 || (byte > 0x0D && byte < 0x20) { suspicious += 1 }
+        }
+        return suspicious <= max(4, head.count / 50)
+    }
+
+    static func isMarkdownName(_ name: String) -> Bool {
+        let ext = (name as NSString).pathExtension.lowercased()
+        return ["md", "markdown", "mdown", "mkd", "mkdn", "mdwn", "mdtxt", "mdtext", "txt", "text"]
+            .contains(ext)
+    }
+
     static func decode(_ data: Data) -> String {
         let gb18030 = String.Encoding(rawValue:
             CFStringConvertEncodingToNSStringEncoding(

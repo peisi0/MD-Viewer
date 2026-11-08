@@ -68,4 +68,4 @@ source.md ──▶ BlockParser ──▶ [MarkdownBlock]
 
 ---
 
-*版本 1.0 · 需要 iOS 26 或更高版本*
+*版本 1.2 · 需要 iOS 26 或更高版本*

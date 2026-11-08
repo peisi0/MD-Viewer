@@ -78,9 +78,20 @@ private struct ReaderStyleKey: EnvironmentKey {
     static let defaultValue = ReaderStyle()
 }
 
+private struct ReaderContentWidthKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 340
+}
+
 extension EnvironmentValues {
     var readerStyle: ReaderStyle {
         get { self[ReaderStyleKey.self] }
         set { self[ReaderStyleKey.self] = newValue }
+    }
+
+    /// Width available to a block, used to keep horizontal code/table
+    /// scrollers from expanding the outer document past the screen.
+    var readerContentWidth: CGFloat {
+        get { self[ReaderContentWidthKey.self] }
+        set { self[ReaderContentWidthKey.self] = newValue }
     }
 }

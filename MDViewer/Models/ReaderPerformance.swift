@@ -40,23 +40,40 @@ final class ReadingProgress {
     }
 }
 
-/// A cheap, self-contained progress indicator. UIKit's `ProgressView`
-/// would otherwise sit inside the glass container and force it to re-composite.
+/// A cheap, self-contained progress indicator. `expanded` draws it as a thin
+/// full-width line at the top of the bottom toolbar instead of a short pill.
+/// Only this view observes `fraction`, so the document tree never rebuilds.
 struct ReaderProgressBar: View {
     let progress: ReadingProgress
+    var expanded: Bool = false
     @Environment(\.readerStyle) private var style
 
     private let width: CGFloat = 56
 
     var body: some View {
         let value = progress.fraction
-        ZStack(alignment: .leading) {
-            Capsule().fill(Color.primary.opacity(0.15))
-            Capsule()
-                .fill(style.accentColor)
-                .frame(width: max(3, width * value), height: 5)
+        Group {
+            if expanded {
+                GeometryReader { geo in
+                    ZStack(alignment: .leading) {
+                        Capsule().fill(Color.primary.opacity(0.14))
+                        Capsule()
+                            .fill(style.accentColor)
+                            .frame(width: max(3, geo.size.width * value), height: 3)
+                    }
+                }
+                .frame(height: 3)
+                .frame(maxWidth: .infinity)
+            } else {
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Color.primary.opacity(0.15))
+                    Capsule()
+                        .fill(style.accentColor)
+                        .frame(width: max(3, width * value), height: 5)
+                }
+                .frame(width: width, height: 5)
+            }
         }
-        .frame(width: width, height: 5)
         // No implicit animation: updates are already quantised to ~12 Hz and
         // a perpetual animation here would keep the compositor busy forever.
         .accessibilityLabel("阅读进度")

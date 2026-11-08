@@ -17,14 +17,15 @@
 		A00000000000000000000027 /* ReaderPerformance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000026 /* ReaderPerformance.swift */; };
 		A00000000000000000000029 /* ReaderStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000028 /* ReaderStyle.swift */; };
 		A0000000000000000000002B /* AppearancePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000002A /* AppearancePanel.swift */; };
-		A0000000000000000000002D /* GlassComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000002C /* GlassComponents.swift */; };
-		A0000000000000000000002F /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000002E /* LibraryView.swift */; };
-		A00000000000000000000031 /* MarkdownBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000030 /* MarkdownBlockView.swift */; };
-		A00000000000000000000033 /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000032 /* ReaderView.swift */; };
-		A00000000000000000000035 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000034 /* SettingsView.swift */; };
-		A00000000000000000000037 /* StyleSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000036 /* StyleSlider.swift */; };
-		A00000000000000000000039 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000038 /* Assets.xcassets */; };
-		A0000000000000000000003B /* Samples in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000003A /* Samples */; };
+		A0000000000000000000002D /* DocumentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000002C /* DocumentPicker.swift */; };
+		A0000000000000000000002F /* GlassComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000002E /* GlassComponents.swift */; };
+		A00000000000000000000031 /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000030 /* LibraryView.swift */; };
+		A00000000000000000000033 /* MarkdownBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000032 /* MarkdownBlockView.swift */; };
+		A00000000000000000000035 /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000034 /* ReaderView.swift */; };
+		A00000000000000000000037 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000036 /* SettingsView.swift */; };
+		A00000000000000000000039 /* StyleSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000038 /* StyleSlider.swift */; };
+		A0000000000000000000003B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000003A /* Assets.xcassets */; };
+		A0000000000000000000003D /* Samples in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000003C /* Samples */; };
 /* End PBXBuildFile section */
 /* Begin PBXFileReference section */
 		A00000000000000000000005 /* MD Viewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MD Viewer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -39,14 +40,15 @@
 		A00000000000000000000026 /* ReaderPerformance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReaderPerformance.swift"; sourceTree = "<group>"; };
 		A00000000000000000000028 /* ReaderStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReaderStyle.swift"; sourceTree = "<group>"; };
 		A0000000000000000000002A /* AppearancePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppearancePanel.swift"; sourceTree = "<group>"; };
-		A0000000000000000000002C /* GlassComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GlassComponents.swift"; sourceTree = "<group>"; };
-		A0000000000000000000002E /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LibraryView.swift"; sourceTree = "<group>"; };
-		A00000000000000000000030 /* MarkdownBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarkdownBlockView.swift"; sourceTree = "<group>"; };
-		A00000000000000000000032 /* ReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReaderView.swift"; sourceTree = "<group>"; };
-		A00000000000000000000034 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView.swift"; sourceTree = "<group>"; };
-		A00000000000000000000036 /* StyleSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StyleSlider.swift"; sourceTree = "<group>"; };
-		A00000000000000000000038 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Assets.xcassets"; sourceTree = "<group>"; };
-		A0000000000000000000003A /* Samples */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Samples"; sourceTree = "<group>"; };
+		A0000000000000000000002C /* DocumentPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DocumentPicker.swift"; sourceTree = "<group>"; };
+		A0000000000000000000002E /* GlassComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GlassComponents.swift"; sourceTree = "<group>"; };
+		A00000000000000000000030 /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LibraryView.swift"; sourceTree = "<group>"; };
+		A00000000000000000000032 /* MarkdownBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarkdownBlockView.swift"; sourceTree = "<group>"; };
+		A00000000000000000000034 /* ReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReaderView.swift"; sourceTree = "<group>"; };
+		A00000000000000000000036 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView.swift"; sourceTree = "<group>"; };
+		A00000000000000000000038 /* StyleSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StyleSlider.swift"; sourceTree = "<group>"; };
+		A0000000000000000000003A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Assets.xcassets"; sourceTree = "<group>"; };
+		A0000000000000000000003C /* Samples */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Samples"; sourceTree = "<group>"; };
 		A0000000000000000000000F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 /* Begin PBXFrameworksBuildPhase section */
@@ -114,12 +116,13 @@
 			isa = PBXGroup;
 			children = (
 				A0000000000000000000002A /* AppearancePanel.swift */,
-				A0000000000000000000002C /* GlassComponents.swift */,
-				A0000000000000000000002E /* LibraryView.swift */,
-				A00000000000000000000030 /* MarkdownBlockView.swift */,
-				A00000000000000000000032 /* ReaderView.swift */,
-				A00000000000000000000034 /* SettingsView.swift */,
-				A00000000000000000000036 /* StyleSlider.swift */,
+				A0000000000000000000002C /* DocumentPicker.swift */,
+				A0000000000000000000002E /* GlassComponents.swift */,
+				A00000000000000000000030 /* LibraryView.swift */,
+				A00000000000000000000032 /* MarkdownBlockView.swift */,
+				A00000000000000000000034 /* ReaderView.swift */,
+				A00000000000000000000036 /* SettingsView.swift */,
+				A00000000000000000000038 /* StyleSlider.swift */,
 			);
 			path = "Views";
 			sourceTree = "<group>";
@@ -127,9 +130,9 @@
 		A00000000000000000000015 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				A0000000000000000000003C /* Info.plist */,
-				A00000000000000000000038 /* Assets.xcassets */,
-				A0000000000000000000003A /* Samples */,
+				A0000000000000000000003E /* Info.plist */,
+				A0000000000000000000003A /* Assets.xcassets */,
+				A0000000000000000000003C /* Samples */,
 			);
 			path = "Resources";
 			sourceTree = "<group>";
@@ -190,8 +193,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A00000000000000000000039 /* Assets.xcassets in Resources */,
-				A0000000000000000000003B /* Samples in Resources */,
+				A0000000000000000000003B /* Assets.xcassets in Resources */,
+				A0000000000000000000003D /* Samples in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,12 +215,13 @@
 				A00000000000000000000027 /* ReaderPerformance.swift in Sources */,
 				A00000000000000000000029 /* ReaderStyle.swift in Sources */,
 				A0000000000000000000002B /* AppearancePanel.swift in Sources */,
-				A0000000000000000000002D /* GlassComponents.swift in Sources */,
-				A0000000000000000000002F /* LibraryView.swift in Sources */,
-				A00000000000000000000031 /* MarkdownBlockView.swift in Sources */,
-				A00000000000000000000033 /* ReaderView.swift in Sources */,
-				A00000000000000000000035 /* SettingsView.swift in Sources */,
-				A00000000000000000000037 /* StyleSlider.swift in Sources */,
+				A0000000000000000000002D /* DocumentPicker.swift in Sources */,
+				A0000000000000000000002F /* GlassComponents.swift in Sources */,
+				A00000000000000000000031 /* LibraryView.swift in Sources */,
+				A00000000000000000000033 /* MarkdownBlockView.swift in Sources */,
+				A00000000000000000000035 /* ReaderView.swift in Sources */,
+				A00000000000000000000037 /* SettingsView.swift in Sources */,
+				A00000000000000000000039 /* StyleSlider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

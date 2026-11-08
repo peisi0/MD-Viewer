@@ -12,6 +12,7 @@ struct SettingsView: View {
     @AppStorage(Prefs.animatedBackdrop) private var animatedBackdrop = false
 
     @State private var showingClearConfirm = false
+    @State private var showingRemoveSamplesConfirm = false
 
     var body: some View {
         NavigationStack {
@@ -38,7 +39,13 @@ struct SettingsView: View {
                 Button("取消", role: .cancel) {}
                 Button("清空", role: .destructive) { library.clearImported() }
             } message: {
-                Text("内置的示例文档会保留。这个操作只会移除你导入的文件。")
+                Text("只会移除你导入的文件。内置示例请在下方单独「移除示例」。")
+            }
+            .alert("移除内置示例？", isPresented: $showingRemoveSamplesConfirm) {
+                Button("取消", role: .cancel) {}
+                Button("移除", role: .destructive) { library.removeAllSamples() }
+            } message: {
+                Text("示例文件仍在 App 内，随时可以用「恢复示例」加回资料库。")
             }
         }
     }
@@ -52,7 +59,7 @@ struct SettingsView: View {
                 VStack(alignment: .leading, spacing: 5) {
                     Text("MD Viewer")
                         .font(.title2.weight(.bold))
-                    Text("版本 1.1 · Build 2")
+                    Text("版本 1.2 · Build 3")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     Text("iOS 26+ · Liquid Glass")
@@ -69,16 +76,8 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 16) {
                 sectionTitle("阅读外观", icon: "textformat.size")
 
-                StyleSlider(title: "字号", value: $fontSize, range: 14...24) {
-                    EmptyView()
-                } trailing: {
-                    EmptyView()
-                }
-                StyleSlider(title: "行距", value: $lineSpacing, range: 2...18) {
-                    EmptyView()
-                } trailing: {
-                    EmptyView()
-                }
+                StyleSlider(title: "字号", value: $fontSize, range: 14...24)
+                StyleSlider(title: "行距", value: $lineSpacing, range: 2...18)
 
                 Toggle(isOn: $animatedBackdrop) {
                     VStack(alignment: .leading, spacing: 2) {
@@ -148,12 +147,22 @@ struct SettingsView: View {
                     Spacer(minLength: 0)
                 }
 
-                HStack(spacing: 10) {
+                HStack(spacing: 8) {
                     Button {
                         library.seedSamples()
                     } label: {
                         Label("恢复示例", systemImage: "sparkles")
-                            .font(.caption.weight(.semibold))
+                            .font(.caption2.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                    }
+                    .buttonStyle(.glass)
+
+                    Button {
+                        showingRemoveSamplesConfirm = true
+                    } label: {
+                        Label("移除示例", systemImage: "xmark")
+                            .font(.caption2.weight(.semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
                     }
@@ -163,12 +172,16 @@ struct SettingsView: View {
                         showingClearConfirm = true
                     } label: {
                         Label("清空导入", systemImage: "trash")
-                            .font(.caption.weight(.semibold))
+                            .font(.caption2.weight(.semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 10)
                     }
                     .buttonStyle(.glass)
                 }
+                Text("也可以在资料库里点每张卡片右上角的 × 单独删除任意文档（含示例）。")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }

@@ -1,7 +1,7 @@
 ---
 title: 欢迎使用 MD Viewer
 author: MD Viewer Team
-version: 1.0
+version: 1.2
 tags: 指南 · Liquid Glass · Markdown
 ---
 

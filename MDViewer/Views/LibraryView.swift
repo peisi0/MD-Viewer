@@ -7,9 +7,13 @@ struct LibraryView: View {
     @Environment(\.readerStyle) private var style
 
     let onOpen: (StoredDocument) -> Void
-    let onGoReader: () -> Void
 
-    @State private var showingImporter = false
+    @State private var picker = DocumentPickerPresenter()
+    @State private var scanning = false
+    @State private var notice: String?
+    @State private var showingNotice = false
+    @State private var pendingDelete: StoredDocument?
+    @State private var showingDeleteConfirm = false
     @State private var searchText = ""
 
     private var filtered: [StoredDocument] {
@@ -43,7 +47,7 @@ struct LibraryView: View {
                     }
                     .padding(.horizontal, 18)
                     .padding(.top, 6)
-                    .padding(.bottom, 110)
+                    .padding(.bottom, 40)
                 }
             }
             .navigationTitle("资料库")
@@ -52,9 +56,14 @@ struct LibraryView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button {
-                            showingImporter = true
+                            picker.present()
                         } label: {
                             Label("从「文件」导入", systemImage: "folder")
+                        }
+                        Button {
+                            scanDocuments()
+                        } label: {
+                            Label("扫描文档目录", systemImage: "doc.viewfinder")
                         }
                         Button {
                             pasteFromClipboard()
@@ -67,29 +76,40 @@ struct LibraryView: View {
                     .buttonStyle(.glassProminent)
                 }
             }
-            .fileImporter(
-                isPresented: $showingImporter,
-                allowedContentTypes: UTType.importableTypes,
-                allowsMultipleSelection: true
-            ) { result in
-                switch result {
-                case .success(let urls):
-                    Task { @MainActor in
-                        var last: StoredDocument?
-                        for url in urls { last = await library.importFile(url) ?? last }
-                        if let last { onOpen(last) }
-                    }
-                case .failure(let error):
-                    library.errorMessage = error.localizedDescription
-                }
-            }
-            .alert("提示", isPresented: Binding(
-                get: { library.errorMessage != nil },
-                set: { presented in if !presented { library.errorMessage = nil } }
-            )) {
-                Button("好", role: .cancel) {}
+            .alert("导入提示", isPresented: $showingNotice) {
+                Button("好", role: .cancel) { notice = nil }
             } message: {
-                Text(library.errorMessage ?? "")
+                Text(notice ?? "")
+            }
+            .confirmationDialog("删除文档", isPresented: $showingDeleteConfirm,
+                                presenting: pendingDelete) { document in
+                Button("删除", role: .destructive) {
+                    library.delete(document)
+                    pendingDelete = nil
+                }
+                Button("取消", role: .cancel) { pendingDelete = nil }
+            } message: { document in
+                Text(document.isSample
+                     ? "《\(document.name)》是内置示例，只会从资料库移除，可在「设置 → 恢复示例」找回。"
+                     : "《\(document.name)》及其文件会一并删除。")
+            }
+            .onAppear {
+                picker.onPick = { urls in handlePicked(urls) }
+                #if DEBUG
+                if ProcessInfo.processInfo.arguments.contains("-mdv-picker") {
+                    DispatchQueue.main.async { picker.present() }
+                }
+                if ProcessInfo.processInfo.arguments.contains("-mdv-pick-sim") {
+                    let docs = FileManager.default.urls(for: .documentDirectory,
+                                                       in: .userDomainMask)[0]
+                    let file = docs.appendingPathComponent("PickerTest.md")
+                    try? "# 选择器导入测试\n\n模拟 asCopy 返回的本地文件 URL 导入成功。\n"
+                        .write(to: file, atomically: true, encoding: .utf8)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+                        picker.onPick?([file])
+                    }
+                }
+                #endif
             }
         }
     }
@@ -117,14 +137,14 @@ struct LibraryView: View {
                     Spacer(minLength: 0)
                 }
 
-                Text("导入 .md 文件，或在「文件」App 里用「共享 → MD Viewer」打开。支持 GFM 表格、任务列表、代码块与 YAML front matter。")
+                Text("导入 .md 文件，或把文件放进 App 的文档目录后点「扫描文档目录」——后者不依赖文件选择器，在侧载环境里更可靠。")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
 
                 HStack(spacing: 12) {
                     Button {
-                        showingImporter = true
+                        picker.present()
                     } label: {
                         Label("导入文件", systemImage: "plus")
                             .font(.subheadline.weight(.semibold))
@@ -134,14 +154,15 @@ struct LibraryView: View {
                     .buttonStyle(.glassProminent)
 
                     Button {
-                        onGoReader()
+                        scanDocuments()
                     } label: {
-                        Label("继续阅读", systemImage: "book")
+                        Label(scanning ? "扫描中…" : "扫描目录", systemImage: "doc.viewfinder")
                             .font(.subheadline.weight(.semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 11)
                     }
                     .buttonStyle(.glass)
+                    .disabled(scanning)
                 }
             }
         }
@@ -149,74 +170,88 @@ struct LibraryView: View {
     }
 
     private func documentCard(_ document: StoredDocument) -> some View {
-        Button {
-            onOpen(document)
-        } label: {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Image(systemName: document.isSample ? "sparkles.rectangle.stack" : "doc.text.fill")
-                        .font(.title2)
-                        .foregroundStyle(style.accentColor)
-                    Spacer()
-                    if document.isSample {
-                        Text("示例")
-                            .font(.caption2.weight(.medium))
-                            .foregroundStyle(.secondary)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 3)
-                            .background(Color.primary.opacity(0.07), in: Capsule())
+        ZStack(alignment: .topTrailing) {
+            Button {
+                onOpen(document)
+            } label: {
+                VStack(alignment: .leading, spacing: 10) {
+                    HStack {
+                        Image(systemName: document.isSample ? "sparkles.rectangle.stack" : "doc.text.fill")
+                            .font(.title2)
+                            .foregroundStyle(style.accentColor)
+                        Spacer()
                     }
-                }
 
-                Text(document.name)
-                    .font(.headline)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-                    .foregroundStyle(.primary)
+                    Text(document.name)
+                        .font(.headline)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+                        .foregroundStyle(.primary)
 
-                Text(document.preview)
-                    .font(.caption)
+                    Text(document.preview)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(3)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Spacer(minLength: 4)
+
+                    Divider().opacity(0.4)
+
+                    HStack(spacing: 6) {
+                        Image(systemName: "textformat.size").imageScale(.small)
+                        Text("\(document.wordCount) 字")
+                        Spacer(minLength: 0)
+                        if document.isSample {
+                            Text("示例")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                        }
+                        Text((document.lastOpenedAt ?? document.addedAt)
+                            .formatted(.dateTime.month().day()))
+                    }
+                    .font(.caption2)
                     .foregroundStyle(.secondary)
-                    .lineLimit(3)
-                    .multilineTextAlignment(.leading)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Spacer(minLength: 4)
-
-                Divider().opacity(0.4)
-
-                HStack(spacing: 6) {
-                    Image(systemName: "textformat.size").imageScale(.small)
-                    Text("\(document.wordCount) 字")
-                    Spacer(minLength: 0)
-                    Text((document.lastOpenedAt ?? document.addedAt)
-                        .formatted(.dateTime.month().day()))
+                    .lineLimit(1)
                 }
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
+                .padding(16)
+                .frame(maxWidth: .infinity, minHeight: 176, alignment: .topLeading)
+                .contentShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
             }
-            .padding(16)
-            .frame(maxWidth: .infinity, minHeight: 176, alignment: .topLeading)
-            .contentShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .buttonStyle(.plain)
+            .glassEffect(
+                .regular.tint(style.accentColor.opacity(0.07)).interactive(),
+                in: RoundedRectangle(cornerRadius: 24, style: .continuous)
+            )
+
+            // Visible on every card (including bundled samples) so samples can
+            // be removed without hunting through a long-press menu.
+            Button {
+                pendingDelete = document
+                showingDeleteConfirm = true
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.secondary)
+                    .frame(width: 24, height: 24)
+                    .background(Circle().fill(Color.primary.opacity(0.09)))
+            }
+            .buttonStyle(.plain)
+            .padding(10)
+            .accessibilityLabel("删除 \(document.name)")
         }
-        .buttonStyle(.plain)
-        .glassEffect(
-            .regular.tint(style.accentColor.opacity(0.07)).interactive(),
-            in: RoundedRectangle(cornerRadius: 24, style: .continuous)
-        )
         .contextMenu {
             Button {
                 onOpen(document)
             } label: {
                 Label("打开", systemImage: "book")
             }
-            if !document.isSample {
-                Button(role: .destructive) {
-                    library.delete(document)
-                } label: {
-                    Label("从资料库移除", systemImage: "trash")
-                }
+            Button(role: .destructive) {
+                pendingDelete = document
+                showingDeleteConfirm = true
+            } label: {
+                Label(document.isSample ? "移除示例" : "从资料库删除", systemImage: "trash")
             }
         }
     }
@@ -229,31 +264,92 @@ struct LibraryView: View {
                     .foregroundStyle(style.accentColor)
                 Text(searchText.isEmpty ? "资料库是空的" : "没有找到匹配的文档")
                     .font(.headline)
-                Text("试试导入一个 .md 文件，或者从剪贴板新建一篇。")
+                Text("导入一个 .md 文件，或从剪贴板新建一篇。内置示例可在「设置」里恢复。")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Button {
-                    showingImporter = true
-                } label: {
-                    Label("导入 Markdown", systemImage: "plus")
-                        .font(.subheadline.weight(.semibold))
+                    .multilineTextAlignment(.center)
+                HStack(spacing: 10) {
+                    Button {
+                        picker.present()
+                    } label: {
+                        Label("导入 Markdown", systemImage: "plus")
+                            .font(.subheadline.weight(.semibold))
+                    }
+                    .buttonStyle(.glassProminent)
+                    Button {
+                        scanDocuments()
+                    } label: {
+                        Label("扫描目录", systemImage: "doc.viewfinder")
+                            .font(.subheadline.weight(.semibold))
+                    }
+                    .buttonStyle(.glass)
                 }
-                .buttonStyle(.glassProminent)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 20)
         }
     }
 
+    // MARK: - Import actions
+
+    private func handlePicked(_ urls: [URL]) {
+        guard !urls.isEmpty else { return }
+        Task { @MainActor in
+            var successes: [StoredDocument] = []
+            var failures: [String] = []
+            for url in urls {
+                if let document = await library.importFile(url) {
+                    successes.append(document)
+                } else {
+                    failures.append(library.errorMessage ?? "无法导入 \(url.lastPathComponent)")
+                }
+                library.errorMessage = nil
+            }
+            if failures.isEmpty, let last = successes.last {
+                onOpen(last)
+            } else {
+                var message = successes.isEmpty ? "" : "已导入 \(successes.count) 篇。\n"
+                message += failures.joined(separator: "\n")
+                notice = message
+                showingNotice = true
+            }
+        }
+    }
+
+    private func scanDocuments() {
+        guard !scanning else { return }
+        scanning = true
+        Task { @MainActor in
+            let count = await library.scanDocumentsDirectory()
+            let error = library.errorMessage
+            library.errorMessage = nil
+            scanning = false
+            var message: String
+            if count > 0 {
+                message = "从文档目录导入了 \(count) 篇 Markdown。"
+            } else {
+                message = "文档目录里没有新的 Markdown 文件。把 .md 放进「文件」App 的 MD Viewer 目录（或 Documents/Inbox）后再扫描一次即可。"
+                if let error { message += "\n\n\(error)" }
+            }
+            notice = message
+            showingNotice = true
+        }
+    }
+
     private func pasteFromClipboard() {
         guard let text = UIPasteboard.general.string, !text.isEmpty else {
-            library.errorMessage = "剪贴板里没有文本内容"
+            notice = "剪贴板里没有文本内容"
+            showingNotice = true
             return
         }
         let name = "剪贴板 \(Date().formatted(.dateTime.month().day().hour().minute())).md"
         Task { @MainActor in
             if let document = await library.importDroppedText(text, named: name) {
                 onOpen(document)
+            } else {
+                notice = library.errorMessage ?? "保存失败"
+                library.errorMessage = nil
+                showingNotice = true
             }
         }
     }

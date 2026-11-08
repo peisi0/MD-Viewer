@@ -6,15 +6,17 @@ private struct ScrollRequest: Equatable {
     let stamp: Int
 }
 
+/// A dedicated full-screen reader. It is presented as a sub-screen from the
+/// library rather than living in a tab, so there is no bottom tab bar eating
+/// vertical space and only one reader view tree exists at a time.
 struct ReaderView: View {
     @Environment(LibraryStore.self) private var library
     @Environment(\.readerStyle) private var style
 
-    let document: StoredDocument?
-    let onGoLibrary: () -> Void
+    let document: StoredDocument
+    let onBack: () -> Void
 
     @State private var parsed: MarkdownDocument?
-    @State private var isLoading = false
     /// Neither of these is read inside `body`, so scroll/search updates cannot
     /// invalidate the whole document view tree.
     @State private var progress = ReadingProgress()
@@ -36,23 +38,14 @@ struct ReaderView: View {
 
     var body: some View {
         Group {
-            if let document, let parsed {
+            if let parsed {
                 reader(document: document, parsed: parsed)
-            } else if isLoading {
-                loadingState
             } else {
-                emptyState
+                loadingState
             }
         }
-        .task(id: document?.id) {
-            guard let document else {
-                parsed = nil
-                isLoading = false
-                return
-            }
+        .task(id: document.id) {
             library.touch(document)
-            isLoading = parsed == nil
-
             let fileURL = library.url(for: document)
             let fallbackTitle = document.name
             // Reading, encoding detection and parsing all happen off the main
@@ -68,7 +61,6 @@ struct ReaderView: View {
             textCache = InlineTextCache()
             progress.reset()
             parsed = result
-            isLoading = false
             applySearch()
         }
         .onChange(of: searchText) { _, newValue in
@@ -88,64 +80,65 @@ struct ReaderView: View {
 
     private func reader(document: StoredDocument, parsed: MarkdownDocument) -> some View {
         NavigationStack {
-            ZStack(alignment: .bottom) {
-                GlassBackdrop(intensity: 0.30)
+            // Pin the whole screen to the proposed width. Without this a wide
+            // GFM table expands the cover's ideal width past the device, the
+            // cover gets centred, and the left edge (plus its padding) lands
+            // off-screen so paragraphs look flush/clipped.
+            GeometryReader { outer in
+                VStack(spacing: 0) {
+                    ScrollViewReader { proxy in
+                        ScrollView(.vertical) {
+                            LazyVStack(alignment: .leading, spacing: 0) {
+                                documentHeader(document: document, parsed: parsed)
 
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        // Lazy: only the visible blocks are instantiated,
-                        // so long documents open and scroll cheaply.
-                        LazyVStack(alignment: .leading, spacing: 0) {
-                            documentHeader(document: document, parsed: parsed)
+                                ForEach(parsed.blocks) { block in
+                                    MarkdownBlockView(
+                                        block: block,
+                                        cache: textCache,
+                                        documentID: parsed.id,
+                                        highlight: matchIDs.contains(block.id) ? committedSearch : nil
+                                    )
+                                    .id("block-\(block.id)")
+                                }
 
-                            ForEach(parsed.blocks) { block in
-                                MarkdownBlockView(
-                                    block: block,
-                                    cache: textCache,
-                                    documentID: parsed.id,
-                                    highlight: matchIDs.contains(block.id) ? committedSearch : nil
-                                )
-                                .id("block-\(block.id)")
+                                Spacer(minLength: 24)
                             }
-
-                            Spacer(minLength: 150)
+                            .padding(.top, 8)
+                            .frame(width: max(1, outer.size.width - 40), alignment: .topLeading)
+                            .environment(\.readerContentWidth, max(1, outer.size.width - 40))
+                            .textSelection(.enabled)
                         }
                         .padding(.horizontal, 20)
-                        .padding(.top, 10)
-                        .textSelection(.enabled)
-                    }
-                    // ScrollGeometry is owned by the ScrollView itself, so it
-                    // survives lazy recycling of offscreen content views.
-                    .onScrollGeometryChange(for: CGFloat.self) { geo in
-                        let scrollable = max(1, geo.contentSize.height - geo.containerSize.height)
-                        let offset = geo.contentOffset.y + geo.contentInsets.top
-                        return min(1, max(0, offset / scrollable))
-                    } action: { _, value in
-                        progress.setFraction(value)
-                    }
-                    .onChange(of: scrollRequest) { _, request in
-                        guard let request else { return }
-                        withAnimation(.easeInOut(duration: 0.42)) {
-                            proxy.scrollTo("block-\(request.blockID)", anchor: .top)
+                        // ScrollGeometry is owned by the ScrollView itself, so it
+                        // survives lazy recycling of offscreen content views.
+                        .onScrollGeometryChange(for: CGFloat.self) { geo in
+                            let scrollable = max(1, geo.contentSize.height - geo.containerSize.height)
+                            let offset = geo.contentOffset.y + geo.contentInsets.top
+                            return min(1, max(0, offset / scrollable))
+                        } action: { _, value in
+                            progress.setFraction(value)
+                        }
+                        .onChange(of: scrollRequest) { _, request in
+                            guard let request else { return }
+                            withAnimation(.easeInOut(duration: 0.42)) {
+                                proxy.scrollTo("block-\(request.blockID)", anchor: .top)
+                            }
                         }
                     }
-                }
 
-                VStack(spacing: 12) {
-                    if showingSearch {
-                        searchBar
-                            .transition(.move(edge: .top).combined(with: .opacity))
-                    }
-                    controls
+                    controlStack
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 12)
-                .animation(.bouncy, value: showingSearch)
-                .animation(.bouncy, value: appearanceExpanded)
+                .frame(width: outer.size.width, height: outer.size.height, alignment: .top)
             }
+            .background { GlassBackdrop(intensity: 0.30) }
             .navigationTitle(parsed.title)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(action: onBack) {
+                        Label("返回", systemImage: "chevron.left")
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Menu {
                         Button {
@@ -255,74 +248,98 @@ struct ReaderView: View {
         .padding(.bottom, 10)
     }
 
-    // MARK: - Floating glass controls
+    // MARK: - Bottom control stack
 
-    private var controls: some View {
+    /// Everything that used to float over the text now lives in one compact
+    /// bar pinned to the bottom. The progress line sits at its top edge.
+    private var controlStack: some View {
         GlassEffectContainer(spacing: 14) {
-            VStack(alignment: .trailing, spacing: 12) {
+            VStack(spacing: 10) {
                 if appearanceExpanded {
                     AppearancePanel {
                         withAnimation(.bouncy) { appearanceExpanded = false }
                     }
                     .glassEffect(
-                        .regular.tint(style.accentColor.opacity(0.12)).interactive(),
+                        .regular.tint(style.accentColor.opacity(0.12)),
                         in: RoundedRectangle(cornerRadius: 26, style: .continuous)
                     )
                     .glassEffectID("appearance", in: glassNamespace)
                     .glassEffectTransition(.matchedGeometry)
                 }
 
-                HStack(spacing: 10) {
-                    // Only this tiny view observes ReadingProgress.fraction.
-                    ReaderProgressBar(progress: progress)
-
-                    Button {
-                        showingTOC = true
-                    } label: {
-                        Label("目录", systemImage: "list.bullet")
-                            .labelStyle(.iconOnly)
-                            .frame(width: 46, height: 46)
-                    }
-                    .buttonStyle(.glass)
-                    .glassEffectID("toc", in: glassNamespace)
-
-                    Button {
-                        withAnimation(.bouncy) { showingSearch.toggle() }
-                        if !showingSearch { searchText = "" }
-                    } label: {
-                        Label("搜索", systemImage: "magnifyingglass")
-                            .labelStyle(.iconOnly)
-                            .frame(width: 46, height: 46)
-                    }
-                    .buttonStyle(.glass)
-                    .glassEffectID("search", in: glassNamespace)
-
-                    if !appearanceExpanded {
-                        Button {
-                            withAnimation(.bouncy) { appearanceExpanded = true }
-                        } label: {
-                            Label("排版", systemImage: "textformat.size")
-                                .labelStyle(.iconOnly)
-                                .frame(width: 46, height: 46)
-                        }
-                        .buttonStyle(.glass)
-                        .glassEffectID("appearance", in: glassNamespace)
-                        .glassEffectTransition(.matchedGeometry)
-                    }
-
-                    Button {
-                        showingShare = true
-                    } label: {
-                        Label("分享", systemImage: "square.and.arrow.up")
-                            .labelStyle(.iconOnly)
-                            .frame(width: 46, height: 46)
-                    }
-                    .buttonStyle(.glassProminent)
-                    .glassEffectID("share", in: glassNamespace)
+                if showingSearch {
+                    searchBar
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
+
+                bottomBar
             }
+            .padding(.horizontal, 14)
+            .padding(.bottom, 6)
+            .animation(.bouncy, value: showingSearch)
+            .animation(.bouncy, value: appearanceExpanded)
         }
         .tint(style.accentColor)
+    }
+
+    private var bottomBar: some View {
+        VStack(spacing: 9) {
+            // Full-width progress, moved all the way down. Only this view
+            // observes ReadingProgress.fraction.
+            ReaderProgressBar(progress: progress, expanded: true)
+                .padding(.horizontal, 6)
+
+            HStack(spacing: 12) {
+                Spacer(minLength: 0)
+                controlButton("目录", "list.bullet", id: "toc") {
+                    showingTOC = true
+                }
+                Spacer()
+                controlButton("搜索", "magnifyingglass", id: "search") {
+                    withAnimation(.bouncy) { showingSearch.toggle() }
+                    if !showingSearch { searchText = "" }
+                }
+                Spacer()
+                if !appearanceExpanded {
+                    controlButton("排版", "textformat.size", id: "appearance") {
+                        withAnimation(.bouncy) { appearanceExpanded = true }
+                    }
+                    .glassEffectTransition(.matchedGeometry)
+                    Spacer()
+                }
+                controlButton("分享", "square.and.arrow.up", id: "share", prominent: true) {
+                    showingShare = true
+                }
+                Spacer(minLength: 0)
+            }
+        }
+        .padding(.horizontal, 14)
+        .padding(.top, 11)
+        .padding(.bottom, 9)
+        // A plain colour fill, not a nested glass surface: stacking glass on
+        // glass would force an extra compositing pass on every redraw.
+        .background(
+            RoundedRectangle(cornerRadius: 26, style: .continuous)
+                .fill(Color.primary.opacity(0.055))
+        )
+    }
+
+    @ViewBuilder
+    private func controlButton(_ title: String, _ icon: String, id: String,
+                               prominent: Bool = false,
+                               action: @escaping () -> Void) -> some View {
+        let label = Label(title, systemImage: icon)
+            .labelStyle(.iconOnly)
+            .frame(width: 44, height: 44)
+        if prominent {
+            Button(action: action) { label }
+                .buttonStyle(.glassProminent)
+                .glassEffectID(id, in: glassNamespace)
+        } else {
+            Button(action: action) { label }
+                .buttonStyle(.glass)
+                .glassEffectID(id, in: glassNamespace)
+        }
     }
 
     private var searchBar: some View {
@@ -362,7 +379,7 @@ struct ReaderView: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
         .glassEffect(
-            .regular.tint(style.accentColor.opacity(0.12)).interactive(),
+            .regular.tint(style.accentColor.opacity(0.12)),
             in: RoundedRectangle(cornerRadius: 22, style: .continuous)
         )
     }
@@ -415,7 +432,7 @@ struct ReaderView: View {
         .presentationDetents([.medium, .large])
     }
 
-    // MARK: - Empty / loading states
+    // MARK: - Loading state
 
     private var loadingState: some View {
         NavigationStack {
@@ -431,36 +448,14 @@ struct ReaderView: View {
                 }
             }
             .navigationTitle("阅读")
-        }
-    }
-
-    private var emptyState: some View {
-        NavigationStack {
-            ZStack {
-                GlassBackdrop(intensity: 0.8)
-                VStack(spacing: 18) {
-                    Image(systemName: "book.closed")
-                        .font(.system(size: 62))
-                        .foregroundStyle(style.accentColor)
-                    Text("还没有打开文档")
-                        .font(.title2.weight(.bold))
-                    Text("从资料库挑一篇，或者导入你自己的 .md 文件。")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                    Button {
-                        onGoLibrary()
-                    } label: {
-                        Label("前往资料库", systemImage: "books.vertical")
-                            .font(.subheadline.weight(.semibold))
-                            .padding(.horizontal, 20)
-                            .padding(.vertical, 12)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(action: onBack) {
+                        Label("返回", systemImage: "chevron.left")
                     }
-                    .buttonStyle(.glassProminent)
                 }
-                .padding(30)
             }
-            .navigationTitle("阅读")
         }
     }
 

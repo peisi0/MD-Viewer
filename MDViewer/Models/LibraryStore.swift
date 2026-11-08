@@ -18,14 +18,11 @@ extension UTType {
         UTType(importedAs: "net.daringfireball.markdown", conformingTo: .plainText)
     }
 
-    static var importableTypes: [UTType] {
-        var types: [UTType] = [.markdownDocument, .plainText, .text]
-        for ext in ["md", "markdown", "mdown", "mkd", "mkdn", "mdtxt"] {
-            if let type = UTType(filenameExtension: ext) { types.append(type) }
-        }
-        var seen: Set<String> = []
-        return types.filter { seen.insert($0.identifier).inserted }
-    }
+    /// `.item` matches every file. Sideload hosts do not always register an
+    /// app's UTImportedTypeDeclarations with LaunchServices, so a narrow
+    /// markdown-only filter can leave .md files unselectable in the picker.
+    /// We accept everything and validate the bytes in `MarkdownText.isText`.
+    static var importableTypes: [UTType] { [.item] }
 }
 
 @MainActor
@@ -142,15 +139,44 @@ final class LibraryStore {
 
     @discardableResult
     func importFile(_ source: URL) async -> StoredDocument? {
-        let scoped = source.startAccessingSecurityScopedResource()
-        defer { if scoped { source.stopAccessingSecurityScopedResource() } }
-
-        guard let data = try? Data(contentsOf: source) else {
-            errorMessage = "无法读取文件：\(source.lastPathComponent)"
-            return nil
-        }
         let name = source.lastPathComponent
         let directory = importedDirectory
+
+        // Read off the main actor, with three fallbacks. A picker URL can be
+        // security-scoped (SwiftUI fileImporter / share sheet), a file-provider
+        // URL that needs NSFileCoordinator, or a plain local copy (asCopy
+        // document picker). Trying all three is cheap and covers sideload
+        // hosts where startAccessingSecurityScopedResource() returns false.
+        let read = await Task.detached(priority: .userInitiated) { () -> (Data?, String) in
+            let scoped = source.startAccessingSecurityScopedResource()
+            defer { if scoped { source.stopAccessingSecurityScopedResource() } }
+
+            if let data = try? Data(contentsOf: source, options: .mappedIfSafe), !data.isEmpty {
+                return (data, "")
+            }
+
+            var coordinated: Data?
+            var coordinationError: NSError?
+            NSFileCoordinator().coordinate(readingItemAt: source, options: [],
+                                           error: &coordinationError) { url in
+                coordinated = try? Data(contentsOf: url, options: .mappedIfSafe)
+            }
+            if let coordinated, !coordinated.isEmpty { return (coordinated, "") }
+
+            if let data = FileManager.default.contents(atPath: source.path), !data.isEmpty {
+                return (data, "")
+            }
+            return (nil, coordinationError?.localizedDescription ?? "文件不可读")
+        }.value
+
+        guard let data = read.0 else {
+            errorMessage = "无法读取 \(name)：\(read.1)\n可改用「扫描文档目录」，或先把文件复制进 App 文档目录。"
+            return nil
+        }
+        guard MarkdownText.isText(data) else {
+            errorMessage = "\(name) 不是文本文件，无法作为 Markdown 导入。"
+            return nil
+        }
 
         if let index = documents.firstIndex(where: { !$0.isSample && $0.name == name }) {
             var updated = documents[index]
@@ -196,6 +222,34 @@ final class LibraryStore {
         return document
     }
 
+    /// Fallback import path that needs no document picker at all.
+    ///
+    /// Files dropped into the app's Documents folder (Files app / Finder file
+    /// sharing / "Open in place" Inbox) are picked up here. This also works
+    /// when a sideload host intercepts the picker or the share sheet.
+    @discardableResult
+    func scanDocumentsDirectory() async -> Int {
+        let docs = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        var candidates: [URL] = []
+        if let entries = try? fileManager.contentsOfDirectory(
+            at: docs, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]) {
+            candidates += entries
+        }
+        let inbox = docs.appendingPathComponent("Inbox", isDirectory: true)
+        if let entries = try? fileManager.contentsOfDirectory(
+            at: inbox, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]) {
+            candidates += entries
+        }
+
+        var added = 0
+        for url in candidates where MarkdownText.isMarkdownName(url.lastPathComponent) {
+            guard !documents.contains(where: { !$0.isSample && $0.name == url.lastPathComponent })
+            else { continue }
+            if await importFile(url) != nil { added += 1 }
+        }
+        return added
+    }
+
     func importDroppedText(_ text: String, named name: String) async -> StoredDocument? {
         guard let data = text.data(using: .utf8) else { return nil }
         let storedName = "\(UUID().uuidString)-\(name)"
@@ -228,10 +282,17 @@ final class LibraryStore {
     }
 
     func delete(_ document: StoredDocument) {
+        // Sample files live in the read-only app bundle; deleting one only
+        // removes its index entry, which persists through `library.json`.
         if !document.isSample {
             try? fileManager.removeItem(at: importedDirectory.appendingPathComponent(document.fileName))
         }
         documents.removeAll { $0.id == document.id }
+        save()
+    }
+
+    func removeAllSamples() {
+        documents.removeAll { $0.isSample }
         save()
     }
 
