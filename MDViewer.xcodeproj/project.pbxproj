@@ -1,0 +1,348 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+/* Begin PBXBuildFile section */
+		A00000000000000000000017 /* MDViewerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000016 /* MDViewerApp.swift */; };
+		A00000000000000000000019 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000018 /* RootView.swift */; };
+		A0000000000000000000001B /* InlineParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000001A /* InlineParser.swift */; };
+		A0000000000000000000001D /* InlineRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000001C /* InlineRenderer.swift */; };
+		A0000000000000000000001F /* MarkdownModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000001E /* MarkdownModels.swift */; };
+		A00000000000000000000021 /* MarkdownParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000020 /* MarkdownParser.swift */; };
+		A00000000000000000000023 /* MarkdownText.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000022 /* MarkdownText.swift */; };
+		A00000000000000000000025 /* LibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000024 /* LibraryStore.swift */; };
+		A00000000000000000000027 /* ReaderPerformance.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000026 /* ReaderPerformance.swift */; };
+		A00000000000000000000029 /* ReaderStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000028 /* ReaderStyle.swift */; };
+		A0000000000000000000002B /* AppearancePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000002A /* AppearancePanel.swift */; };
+		A0000000000000000000002D /* GlassComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000002C /* GlassComponents.swift */; };
+		A0000000000000000000002F /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000002E /* LibraryView.swift */; };
+		A00000000000000000000031 /* MarkdownBlockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000030 /* MarkdownBlockView.swift */; };
+		A00000000000000000000033 /* ReaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000032 /* ReaderView.swift */; };
+		A00000000000000000000035 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000034 /* SettingsView.swift */; };
+		A00000000000000000000037 /* StyleSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000036 /* StyleSlider.swift */; };
+		A00000000000000000000039 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A00000000000000000000038 /* Assets.xcassets */; };
+		A0000000000000000000003B /* Samples in Resources */ = {isa = PBXBuildFile; fileRef = A0000000000000000000003A /* Samples */; };
+/* End PBXBuildFile section */
+/* Begin PBXFileReference section */
+		A00000000000000000000005 /* MD Viewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MD Viewer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A00000000000000000000016 /* MDViewerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MDViewerApp.swift"; sourceTree = "<group>"; };
+		A00000000000000000000018 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "RootView.swift"; sourceTree = "<group>"; };
+		A0000000000000000000001A /* InlineParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InlineParser.swift"; sourceTree = "<group>"; };
+		A0000000000000000000001C /* InlineRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "InlineRenderer.swift"; sourceTree = "<group>"; };
+		A0000000000000000000001E /* MarkdownModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarkdownModels.swift"; sourceTree = "<group>"; };
+		A00000000000000000000020 /* MarkdownParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarkdownParser.swift"; sourceTree = "<group>"; };
+		A00000000000000000000022 /* MarkdownText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarkdownText.swift"; sourceTree = "<group>"; };
+		A00000000000000000000024 /* LibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LibraryStore.swift"; sourceTree = "<group>"; };
+		A00000000000000000000026 /* ReaderPerformance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReaderPerformance.swift"; sourceTree = "<group>"; };
+		A00000000000000000000028 /* ReaderStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReaderStyle.swift"; sourceTree = "<group>"; };
+		A0000000000000000000002A /* AppearancePanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppearancePanel.swift"; sourceTree = "<group>"; };
+		A0000000000000000000002C /* GlassComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GlassComponents.swift"; sourceTree = "<group>"; };
+		A0000000000000000000002E /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "LibraryView.swift"; sourceTree = "<group>"; };
+		A00000000000000000000030 /* MarkdownBlockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MarkdownBlockView.swift"; sourceTree = "<group>"; };
+		A00000000000000000000032 /* ReaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReaderView.swift"; sourceTree = "<group>"; };
+		A00000000000000000000034 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsView.swift"; sourceTree = "<group>"; };
+		A00000000000000000000036 /* StyleSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "StyleSlider.swift"; sourceTree = "<group>"; };
+		A00000000000000000000038 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Assets.xcassets"; sourceTree = "<group>"; };
+		A0000000000000000000003A /* Samples */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Samples"; sourceTree = "<group>"; };
+		A0000000000000000000000F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+/* Begin PBXFrameworksBuildPhase section */
+		A00000000000000000000007 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+/* Begin PBXGroup section */
+		A00000000000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000010,
+				A00000000000000000000003,
+			);
+			sourceTree = "<group>";
+		};
+		A00000000000000000000010 /* MDViewer */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000011 /* App */,
+				A00000000000000000000012 /* Markdown */,
+				A00000000000000000000013 /* Models */,
+				A00000000000000000000014 /* Views */,
+				A00000000000000000000015 /* Resources */,
+			);
+			path = "MDViewer";
+			sourceTree = "<group>";
+		};
+		A00000000000000000000011 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000016 /* MDViewerApp.swift */,
+				A00000000000000000000018 /* RootView.swift */,
+			);
+			path = "App";
+			sourceTree = "<group>";
+		};
+		A00000000000000000000012 /* Markdown */ = {
+			isa = PBXGroup;
+			children = (
+				A0000000000000000000001A /* InlineParser.swift */,
+				A0000000000000000000001C /* InlineRenderer.swift */,
+				A0000000000000000000001E /* MarkdownModels.swift */,
+				A00000000000000000000020 /* MarkdownParser.swift */,
+				A00000000000000000000022 /* MarkdownText.swift */,
+			);
+			path = "Markdown";
+			sourceTree = "<group>";
+		};
+		A00000000000000000000013 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000024 /* LibraryStore.swift */,
+				A00000000000000000000026 /* ReaderPerformance.swift */,
+				A00000000000000000000028 /* ReaderStyle.swift */,
+			);
+			path = "Models";
+			sourceTree = "<group>";
+		};
+		A00000000000000000000014 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				A0000000000000000000002A /* AppearancePanel.swift */,
+				A0000000000000000000002C /* GlassComponents.swift */,
+				A0000000000000000000002E /* LibraryView.swift */,
+				A00000000000000000000030 /* MarkdownBlockView.swift */,
+				A00000000000000000000032 /* ReaderView.swift */,
+				A00000000000000000000034 /* SettingsView.swift */,
+				A00000000000000000000036 /* StyleSlider.swift */,
+			);
+			path = "Views";
+			sourceTree = "<group>";
+		};
+		A00000000000000000000015 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A0000000000000000000003C /* Info.plist */,
+				A00000000000000000000038 /* Assets.xcassets */,
+				A0000000000000000000003A /* Samples */,
+			);
+			path = "Resources";
+			sourceTree = "<group>";
+		};
+		A00000000000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A00000000000000000000005 /* MD Viewer.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+/* Begin PBXNativeTarget section */
+		A00000000000000000000004 /* MDViewer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A0000000000000000000000A /* Build configuration list for PBXNativeTarget "MDViewer" */;
+			buildPhases = (
+				A00000000000000000000006 /* Sources */,
+				A00000000000000000000007 /* Frameworks */,
+				A00000000000000000000008 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MDViewer;
+			productName = MDViewer;
+			productReference = A00000000000000000000005 /* MD Viewer.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+/* Begin PBXProject section */
+		A00000000000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2720;
+				LastUpgradeCheck = 2720;
+				TargetAttributes = { A00000000000000000000004 = { CreatedOnToolsVersion = 27.2; }; };
+			};
+			buildConfigurationList = A00000000000000000000009 /* Build configuration list for PBXProject "MDViewer" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (en, Base, "zh-Hans",);
+			mainGroup = A00000000000000000000002;
+			productRefGroup = A00000000000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A00000000000000000000004 /* MDViewer */,
+			);
+		};
+/* End PBXProject section */
+/* Begin PBXResourcesBuildPhase section */
+		A00000000000000000000008 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000039 /* Assets.xcassets in Resources */,
+				A0000000000000000000003B /* Samples in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+/* Begin PBXSourcesBuildPhase section */
+		A00000000000000000000006 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A00000000000000000000017 /* MDViewerApp.swift in Sources */,
+				A00000000000000000000019 /* RootView.swift in Sources */,
+				A0000000000000000000001B /* InlineParser.swift in Sources */,
+				A0000000000000000000001D /* InlineRenderer.swift in Sources */,
+				A0000000000000000000001F /* MarkdownModels.swift in Sources */,
+				A00000000000000000000021 /* MarkdownParser.swift in Sources */,
+				A00000000000000000000023 /* MarkdownText.swift in Sources */,
+				A00000000000000000000025 /* LibraryStore.swift in Sources */,
+				A00000000000000000000027 /* ReaderPerformance.swift in Sources */,
+				A00000000000000000000029 /* ReaderStyle.swift in Sources */,
+				A0000000000000000000002B /* AppearancePanel.swift in Sources */,
+				A0000000000000000000002D /* GlassComponents.swift in Sources */,
+				A0000000000000000000002F /* LibraryView.swift in Sources */,
+				A00000000000000000000031 /* MarkdownBlockView.swift in Sources */,
+				A00000000000000000000033 /* ReaderView.swift in Sources */,
+				A00000000000000000000035 /* SettingsView.swift in Sources */,
+				A00000000000000000000037 /* StyleSlider.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+/* Begin XCBuildConfiguration section */
+		A0000000000000000000000B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = ("DEBUG=1", "$(inherited)",);
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A0000000000000000000000C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_OPTIMIZATION_LEVEL = s;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A0000000000000000000000D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MDViewer/Resources/Info.plist;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.mdviewer.ios;
+				PRODUCT_NAME = "MD Viewer";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A0000000000000000000000E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = MDViewer/Resources/Info.plist;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.mdviewer.ios;
+				PRODUCT_NAME = "MD Viewer";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = minimal;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+/* Begin XCConfigurationList section */
+		A00000000000000000000009 /* Build configuration list for PBXProject "MDViewer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0000000000000000000000B /* Debug */,
+				A0000000000000000000000C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A0000000000000000000000A /* Build configuration list for PBXNativeTarget "MDViewer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A0000000000000000000000D /* Debug */,
+				A0000000000000000000000E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A00000000000000000000001 /* Project object */;
+}
